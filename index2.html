@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+  <style>
+    #my-custom-area {
+      background: rgba(52, 152, 219, 0.2);
+      border: 2px dotted #2980b9;
+    }
+  </style>
+  <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/selection-area@1.2.0/dist/selection-area.umd.js"></script>
+</head>
+<html>
+<body>
+
+<div class="parent" data-selectable=".child">
+  <canvas class="child" id="canvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+    Your browser does not support the HTML5 canvas tag.
+    </canvas>
+</div>
+<table>
+    <thead>
+        <th>#</th>
+        <th>Comment Text</th>
+    </thead>
+    <tbody>
+        
+    </tbody>
+</table>
+  <img id="my-image" style="display: none; justify-content: center;" src="https://png.pngtree.com/thumb_back/fh260/background/20230610/pngtree-flame-lighted-car-desktop-wallpaper-hd-1920x1080-image_2935337.jpg" alt="Your Image">
+
+<div style="display: none; position: absolute; background-color: #d3d3d3;" id="comment">
+  <input type="text" id="commentText">
+  <button id="addComment">Add Comment</button>
+</div>
+
+<script>
+const commentsPos = {};
+let config = {
+    container: document.querySelector('.parent'),
+    area: 'my-custom-area',
+    targets: '.child',
+    touchable: true,
+    autostart: true,
+    onselect:selection=>{
+      console.log(selection);
+    },
+    callback: selection => {
+    }
+}
+
+let selectable = new SelectionArea(config);
+let commentCount = 0;
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var img = document.getElementById("my-image");
+var commentBox = document.getElementById("comment");
+var x;
+var y;
+img.onload = function() {
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+}
+
+canvas.addEventListener('click', function(event) {
+  x = event.pageX - canvas.offsetLeft;
+  y = event.pageY - canvas.offsetTop;
+  drawMarker(x, y);
+  showCommentBox(x,y);
+}, false);
+
+function drawMarker(x, y) {
+  commentCount+=1;
+  ctx.beginPath();
+  ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+  ctx.fillStyle = 'red';
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#003300';
+  ctx.stroke();
+
+  ctx.fillStyle = 'white';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(commentCount, x, y);
+}
+
+function showCommentBox(x, y) {
+  commentBox.style.left = x + 'px';
+  commentBox.style.top = y + 'px';
+  commentBox.style.display = 'block';
+}
+
+
+$("#addComment").on("click",function(){
+  $("#comment").css("display","none");
+  commentsPos[commentCount] = {
+    commentPos:[x,y],
+    commentText:$("#commentText").val()
+  }
+  $("tbody").append(`
+  <tr>
+    <td>${commentCount}</td>  
+    <td>${$("#commentText").val()}</td>  
+    </tr>
+    `)
+    $("#commentText").val("");
+  console.log(commentsPos);
+})
+
+</script>
+
+</body>
+</html>

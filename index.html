@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Labeling</title>
+  <style>
+    /* Container for image and label */
+    .image-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    /* Style for the label */
+    .label {
+      position: absolute;
+      background-color: yellow; /* Semi-transparent background */
+      padding: 5px; /* Adjust padding as needed */
+      border-radius: 5px; /* Rounded corners */
+      font-size: 14px; /* Adjust font size as needed */
+      pointer-events: none; /* Allows click events to pass through the label */
+    }
+    .marker {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+    }
+  </style>
+  <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<!-- Container for the image and label -->
+<div class="image-container">
+  <img id="my-image" style="display: flex; justify-content: center;" src="https://png.pngtree.com/thumb_back/fh260/background/20230610/pngtree-flame-lighted-car-desktop-wallpaper-hd-1920x1080-image_2935337.jpg" alt="Your Image">
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const imageContainer = document.querySelector('.image-container');
+    const image = document.getElementById('my-image');
+    const markers = [];
+
+    image.addEventListener('click', function(event) {
+        const marker = createMarker(event.offsetX, event.offsetY);
+        markers.push({ x: event.offsetX, y: event.offsetY });
+        imageContainer.appendChild(marker);
+    });
+
+    function createMarker(x, y) {
+        const marker = document.createElement('div');
+        marker.classList.add('marker');
+        marker.style.left = x + 'px';
+        marker.style.top = y + 'px';
+        return marker;
+    }
+
+    // Function to update marker positions when image position changes
+    function updateMarkerPositions() {
+        markers.forEach(function(markerPos) {
+            const rect = image.getBoundingClientRect();
+            const scaleX = image.width / rect.width;
+            const scaleY = image.height / rect.height;
+            const newX = markerPos.x * scaleX + rect.left;
+            const newY = markerPos.y * scaleY + rect.top;
+            const marker = createMarker(newX, newY);
+            imageContainer.appendChild(marker);
+        });
+    }
+
+    // Call the updateMarkerPositions function whenever the image position changes
+    // For example, if the image is being dragged, you would call it within the drag event handler
+
+});
+
+</script>
+
+</body>
+</html>
