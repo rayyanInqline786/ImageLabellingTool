@@ -12,7 +12,7 @@
 <html>
 <body>
 
-<div class="parent" data-selectable=".child">
+<div class="parent" data-selectable=".child" style="width: 500px !important; height: 500px !important;">
   <canvas class="child" id="canvas" width="500" height="500" style="border:1px solid #d3d3d3;">
     Your browser does not support the HTML5 canvas tag.
     </canvas>
@@ -41,12 +41,15 @@ let config = {
     targets: '.child',
     touchable: true,
     autostart: true,
-    onselect:selection=>{
-      console.log(selection);
-    },
     callback: selection => {
+      // console.log($("#my-custom-area").);
+      // console.log($("#my-custom-area").height);
     }
-}
+  }
+  
+$("#my-custom-area").resize(function(){
+  console.log("jelllllo");
+});
 
 let selectable = new SelectionArea(config);
 let commentCount = 0;
@@ -63,14 +66,19 @@ img.onload = function() {
 canvas.addEventListener('click', function(event) {
   x = event.pageX - canvas.offsetLeft;
   y = event.pageY - canvas.offsetTop;
-  drawMarker(x, y);
+  drawMarker(x, y,0,0,'circle');
   showCommentBox(x,y);
 }, false);
 
-function drawMarker(x, y) {
+function drawMarker(x, y,width,height,seltype) {
   commentCount+=1;
   ctx.beginPath();
-  ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+  if(seltype=='circle'){
+    ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+  }
+  else{
+    ctx.fillRect(x, y, width, height);
+  }
   ctx.fillStyle = 'red';
   ctx.fill();
   ctx.lineWidth = 2;

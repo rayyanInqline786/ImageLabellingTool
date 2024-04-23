@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.15/css/jquery.Jcrop.css">
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.15/js/jquery.Jcrop.js"></script>
+
+</head>
+
+<body>
+    <button id="rangeSelection">Range Selection</button>
+    <button id="labelImage">Label Image</button>
+    <div class="parent" id="hello" data-selectable=".child" style="width: 500px !important; height: 500px !important;">
+        <canvas class="child" id="canvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+            Your browser does not support the HTML5 canvas tag.
+        </canvas>
+    </div>
+    <table>
+        <thead>
+            <th>#</th>
+            <th>Comment Text</th>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <img id="my-image" style="display: none; justify-content: center;"
+        src="https://png.pngtree.com/thumb_back/fh260/background/20230610/pngtree-flame-lighted-car-desktop-wallpaper-hd-1920x1080-image_2935337.jpg"
+        alt="Your Image">
+
+    <div style="display: none; position: absolute; background-color: #d3d3d3;" id="comment">
+        <input type="text" id="commentText">
+        <button id="addComment">Add Comment</button>
+    </div>
+    <script>
+        let isRangeSelection = false;
+        let jcropInstance;
+        $("#rangeSelection").on("click",function(){
+            isRangeSelection = true
+            jcropInstance = $('#hello').Jcrop({
+                        onSelect: function(c){
+                            $('#hello').data('Jcrop').release();
+                        }
+                    });
+        })
+        $("#labelImage").on("click",function(){
+            isRangeSelection = false;
+            debugger
+        })
+        const commentsPos = {};
+        let commentCount = 0;
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var img = document.getElementById("my-image");
+        var commentBox = document.getElementById("comment");
+        var x;
+        var y;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
+
+        canvas.addEventListener('click', function (event) {
+            x = event.pageX - canvas.offsetLeft;
+            y = event.pageY - canvas.offsetTop;
+            if(!isRangeSelection){
+                drawMarker(x, y, 0, 0, 'circle');
+                showCommentBox(x, y);
+            }
+        }, false);
+
+        function drawMarker(x, y, width, height, seltype) {
+            commentCount += 1;
+            ctx.beginPath();
+            if (seltype == 'circle') {
+                ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+            }
+            else {
+                ctx.fillRect(x, y, width, height);
+            }
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#003300';
+            ctx.stroke();
+
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(commentCount, x, y);
+        }
+
+        function showCommentBox(x, y) {
+            commentBox.style.left = x + 'px';
+            commentBox.style.top = y + 'px';
+            commentBox.style.display = 'block';
+        }
+
+
+        $("#addComment").on("click", function () {
+            $("#comment").css("display", "none");
+            commentsPos[commentCount] = {
+                commentPos: [x, y],
+                commentText: $("#commentText").val()
+            }
+            $("tbody").append(`
+  <tr>
+    <td>${commentCount}</td>  
+    <td>${$("#commentText").val()}</td>  
+    </tr>
+    `)
+            $("#commentText").val("");
+            console.log(commentsPos);
+        })
+
+    </script>
+</body>
+
+</html>
